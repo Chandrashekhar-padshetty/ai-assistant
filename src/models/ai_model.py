@@ -1,4 +1,5 @@
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from difflib import SequenceMatcher
 
 class AIModel:
     def __init__(self, model_name="distilbert-base-uncased-distilled-squad"):
@@ -37,8 +38,17 @@ class AIModel:
         print(f"Raw Predicted Answer: {answer}")
 
         # Validate the answer
-        if answer.strip() == "" or answer not in context:
-            print("Invalid or irrelevant answer detected.")
+        if answer.strip() == "":
+            print("Invalid or empty answer detected.")
+            return "The context does not contain a valid answer to the question."
+
+        # Check for similarity with the context
+        similarity_threshold = 0.6  # Adjust this threshold as needed
+        similarity = SequenceMatcher(None, answer, context).ratio()
+        print(f"Answer similarity with context: {similarity}")
+
+        if similarity < similarity_threshold:
+            print("Answer is not sufficiently similar to the context.")
             return "The context does not contain a valid answer to the question."
 
         # Confidence threshold (optional, can be tuned)
